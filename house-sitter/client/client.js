@@ -37,3 +37,20 @@ Template.showHouse.helpers({
         });
     }
 });
+
+Template.plantDetails.helpers({
+    // disable button when a plant has been watered
+    isWatered: function () {
+        // plantId is derived from the data-id
+        var plantId = Session.get("selectedHouse") + '-' + this.color;
+        return Session.get(plantId) ? 'disabled' : '';
+    }
+});
+
+Template.plantDetails.events({
+    'click button.water': function (evt) {
+        // data-id is a unique, template generated ID for each color of plant in a house
+        var plantId = $(evt.currentTarget).attr('data-id');
+        Session.set(plantId, true);
+    }
+});

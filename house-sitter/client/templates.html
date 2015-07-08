@@ -46,6 +46,7 @@
     <!-- db fields from house.plants context -->
     <p><strong>Plant color:</strong> {{color}}</p>
     <p><strong>Instructions:</strong> {{instructions}}
+        <!-- data-id is a html generated ID, unique for each color of plant in a house-->
         <button class="water" data-id="{{../_id}}-{{color}}"
             {{isWatered}}>Done</button>
     </p>
