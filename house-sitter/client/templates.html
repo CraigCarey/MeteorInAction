@@ -26,6 +26,29 @@
 </template>
 
 <template name="showHouse">
+
+    <!-- setting the data context for the template explicitly-->
+    {{#with house}}
+        <!-- access db fields using dot notation -->
+        <h2>Taking care of {{name}}'s house</h2>
+
+        <!-- each further narrows the datacontext for the subtemplate -->
+        {{#each plants }}
+            {{> plantDetails }}
+        {{/each}}
+    {{else}}
+        You need to select a house.
+    {{/with}}
+</template>
+
+<!-- subtemplate for showHouse template -->
+<template name="plantDetails">
+    <!-- db fields from house.plants context -->
+    <p><strong>Plant color:</strong> {{color}}</p>
+    <p><strong>Instructions:</strong> {{instructions}}
+        <button class="water" data-id="{{../_id}}-{{color}}"
+            {{isWatered}}>Done</button>
+    </p>
 </template>
 
 <template name="houseForm">

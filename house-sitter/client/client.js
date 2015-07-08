@@ -1,9 +1,16 @@
+// Dependent on Session "selectedHouse" variable, will run automatically on changes
+Tracker.autorun(function() {
+    console.log("The selectedHouse ID is: " +
+        Session.get("selectedHouse")
+    );
+});
+
 Template.selectHouse.helpers({
 
     // anything defined in a template is reactive
     housesNameId: function () {
-        // return all documents from collection (for now)
-        return HousesCollection.find({}, {});
+        // return the name and _id fields for all documents in collection
+        return HousesCollection.find({}, {fields: {name: 1, _id: 1} });
     },
 
     isSelected: function () {
@@ -21,3 +28,12 @@ Template.selectHouse.events = {
         Session.set("selectedHouse", evt.currentTarget.value);
     }
 };
+
+Template.showHouse.helpers({
+    // Return full document based on Session variable "selectedHouse"
+    house: function () {
+        return HousesCollection.findOne({
+            _id: Session.get("selectedHouse")
+        });
+    }
+});
