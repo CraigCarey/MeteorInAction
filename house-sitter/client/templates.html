@@ -1,0 +1,32 @@
+<head>
+    <title>The House-Sitter</title>
+</head>
+
+<body>
+    <h1>The House-Sitter App</h1>
+    {{> selectHouse }}
+    {{> showHouse }}
+    {{> houseForm }}
+</body>
+
+<!-- Dropdown selector --->
+<template name="selectHouse">
+
+    <select id="selectHouse">
+
+        <!-- Begin with an empty obect selected -->
+        <option value="" {{isSelected}}></option>
+
+        {{#each housesNameId}}
+            <option value="{{_id}}" {{isSelected}}>{{name}}</option>
+        {{/each}} #B
+
+    </select>
+
+</template>
+
+<template name="showHouse">
+</template>
+
+<template name="houseForm">
+</template>
