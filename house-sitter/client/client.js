@@ -6,7 +6,6 @@ Tracker.autorun(function() {
 });
 
 Template.selectHouse.helpers({
-
     // anything defined in a template is reactive
     housesNameId: function () {
         // return the name and _id fields for all documents in collection
@@ -20,7 +19,6 @@ Template.selectHouse.helpers({
 });
 
 Template.selectHouse.events = {
-
     // need to pass the event as an argument so the function can access the selection value
     'change #selectHouse': function (evt) {
 
@@ -52,5 +50,32 @@ Template.plantDetails.events({
         // data-id is a unique, template generated ID for each color of plant in a house
         var plantId = $(evt.currentTarget).attr('data-id');
         Session.set(plantId, true);
+
+        // insert current timestamp
+        var lastvisit = new Date();
+
+        // Since calling from the client, can only update a single _id
+        HousesCollection.update({_id: Session.get("selectedHouse")},{$set: {lastvisit:lastvisit }});
+    }
+});
+
+Template.houseForm.events({
+    'click button#saveHouse': function (evt) {
+        // suppress page's default submit behaviour
+        evt.preventDefault();
+
+        // Use jQuery to retrieve input field values and put them in local variables
+        var houseName = $('input[id=house-name]').val();
+        var plantColor = $('input[id=plant-color]').val();
+        var plantInstructions = $('input[id=plant-instructions]').val();
+        Session.set('selectedHouseId', HousesCollection.insert({
+            name: houseName,
+            plants: [{
+                color: plantColor,
+                instructions: plantInstructions
+            }]
+        }));
+        // clear the form
+        $('input').val('');
     }
 });

@@ -14,7 +14,7 @@
 
     <select id="selectHouse">
 
-        <!-- Begin with an empty obect selected -->
+        <!-- Begin with an empty object selected -->
         <option value="" {{isSelected}}></option>
 
         {{#each housesNameId}}
@@ -31,11 +31,13 @@
     {{#with house}}
         <!-- access db fields using dot notation -->
         <h2>Taking care of {{name}}'s house</h2>
-
+         <!-- Display timestamp of last visit to this house -->
+        <p>Last visit: {{lastvisit}}</p>
         <!-- each further narrows the datacontext for the subtemplate -->
         {{#each plants }}
             {{> plantDetails }}
         {{/each}}
+    <!-- if house is null -->
     {{else}}
         You need to select a house.
     {{/with}}
@@ -53,4 +55,14 @@
 </template>
 
 <template name="houseForm">
+    <h3>Add a house</h3>
+    <form id="houseForm">
+        Name <input id="house-name" type="text" placeholder="Name"><br/>
+        Plant<br/>
+        Color <input id="plant-color" type="text">
+        Instructions <input id="plant-instructions" type="text">
+        <br/>
+        <br/>
+        <button id="saveHouse">Save House</button>
+    </form>
 </template>
