@@ -26,7 +26,6 @@
 </template>
 
 <template name="showHouse">
-
     <!-- setting the data context for the template explicitly-->
     {{#with house}}
         <!-- access db fields using dot notation -->
@@ -37,6 +36,7 @@
         {{#each plants }}
             {{> plantDetails }}
         {{/each}}
+        <button id="delete">Delete this house</button>
     <!-- if house is null -->
     {{else}}
         You need to select a house.

@@ -36,6 +36,19 @@ Template.showHouse.helpers({
     }
 });
 
+Template.showHouse.events({
+    'click button#delete': function (evt) {
+        // 'this' is the current data context: the selected house document
+        var id = this._id;
+        // show a confirmation dialog
+        var deleteConfirmation = confirm("Really delete this house?");
+        if (deleteConfirmation) {
+            // removes the document from both client and server
+            HousesCollection.remove(id);
+        }
+    }
+});
+
 Template.plantDetails.helpers({
     // disable button when a plant has been watered
     isWatered: function () {
