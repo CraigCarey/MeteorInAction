@@ -1,9 +1,28 @@
+// 'null' or nameless Mongo collections are local only
+LocalHouse = new Mongo.Collection(null);
+
+// default object, used to define the structure of a db entry
+var newHouse = {
+    name: '',
+    plants: [],
+    lastsave: 'never',
+    status: 'unsaved'
+};
+
+Session.setDefault('selectedHouseId', '');
+
 // Dependent on Session "selectedHouse" variable, will run automatically on changes
 Tracker.autorun(function() {
     console.log("The selectedHouse ID is: " +
         Session.get("selectedHouse")
     );
 });
+
+// global helper, so selectedHouse accessible from all templates
+Template.registerHelper('selectedHouse', function () {
+    return LocalHouse.findOne(Session.get('selectedHouseId'));
+});
+
 
 Template.selectHouse.helpers({
     // anything defined in a template is reactive
@@ -22,19 +41,22 @@ Template.selectHouse.events = {
     // need to pass the event as an argument so the function can access the selection value
     'change #selectHouse': function (evt) {
 
-        // selectedHouse is a Session variable used to store the current dropdown selection
-        Session.set("selectedHouse", evt.currentTarget.value);
+        var selectedId = evt.currentTarget.value;
+
+        // Insert a new doc or update if the _id exists
+        var newId = LocalHouse.upsert(
+            selectedId,
+            // If no document was found, set reactiveHouseObject to the newHouse object
+            HousesCollection.findOne(selectedId) || newHouse
+        ).insertedId;
+
+        // If no insert took place you can use selectedId directly
+        if (!newId) newId = selectedId;
+
+        Session.set('selectedHouseId', newId);
+
     }
 };
-
-Template.showHouse.helpers({
-    // Return full document based on Session variable "selectedHouse"
-    house: function () {
-        return HousesCollection.findOne({
-            _id: Session.get("selectedHouse")
-        });
-    }
-});
 
 Template.showHouse.events({
     'click button#delete': function (evt) {
