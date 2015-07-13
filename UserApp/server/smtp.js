@@ -2,8 +2,8 @@ Meteor.startup(function () {
 
     // Simple Mail Transfer Protocol
     smtp = {
-        username: 'blah@gmail.com',
-        password: 'blahblahblah',
+        username: 'sgccareythrowaway@gmail.com',
+        password: 'blah',
         server: 'smtp.gmail.com',
         port: 587
     };

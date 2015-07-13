@@ -6,7 +6,8 @@
 
 meteor-platform
 autopublish
-insecure
 accounts-password
 accounts-ui
 email
+accounts-facebook
+service-configuration
