@@ -23,6 +23,17 @@ Template.registerHelper('selectedHouse', function () {
     return LocalHouse.findOne(Session.get('selectedHouseId'));
 });
 
+// global helper that takes a list and returns it with an index attribute
+Template.registerHelper('withIndex', function (list) {
+
+    // Underscore.js’s map function is used to iterate over a list
+    var withIndex = _.map(list, function (v, i) {
+        if (v === null) return;
+        v.index = i;
+        return v;
+    });
+    return withIndex;
+});
 
 Template.selectHouse.helpers({
     // anything defined in a template is reactive
