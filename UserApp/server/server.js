@@ -10,5 +10,15 @@ Accounts.onCreateUser(function (options, user) {
         user.profile = {};
     }
     user.profile.rank = "White belt";
+
+    // if user has provided an email address
+    if (options.email) {
+
+        // allow meteor 2s to create a user document, then send a verification email
+        Meteor.setTimeout(function () {
+            Accounts.sendVerificationEmail(user._id);
+        }, 2 * 1000);
+    }
+
     return user;
 }); 
