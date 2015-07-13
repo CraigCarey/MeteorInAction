@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="ce328b4a-47bd-468e-96bd-d52d1853c6dc" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/client.js" afterPath="$PROJECT_DIR$/client/client.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/style.css" afterPath="$PROJECT_DIR$/client/style.css" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/client/templates.html" afterPath="$PROJECT_DIR$/client/templates.html" />
-    </list>
+    <list default="true" id="ce328b4a-47bd-468e-96bd-d52d1853c6dc" name="Default" comment="" />
     <ignored path="house-sitter.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
