@@ -14,7 +14,7 @@ Session.setDefault('selectedHouseId', '');
 // Dependent on Session "selectedHouse" variable, will run automatically on changes
 Tracker.autorun(function() {
     console.log("The selectedHouse ID is: " +
-        Session.get("selectedHouse")
+        Session.get("selectedHouseId")
     );
 });
 
@@ -76,8 +76,10 @@ Template.showHouse.events({
         // show a confirmation dialog
         var deleteConfirmation = confirm("Really delete this house?");
         if (deleteConfirmation) {
-            // removes the document from both client and server
+            // removes the document from remote db
             HousesCollection.remove(id);
+            // remove from local collection
+            LocalHouse.remove(id);
         }
     }
 });
@@ -110,23 +112,30 @@ Template.houseForm.events({
     // updates house-name on each change
     'keyup input#house-name': function (evt) {
         evt.preventDefault();
-        var modifier = {$set: {'name': evt.currentTarget.value}};
+        var modifier = {$set: {'name': evt.target.value, 'status': 'unsaved'}};
         updateLocalHouse(Session.get('selectedHouseId'), modifier);
     },
 
     'click button.addPlant': function (evt) {
         evt.preventDefault();
         var newPlant = {color: '', instructions: ''};
-        var modifier = {$push: {'plants': newPlant}};
+
+        // push and set can be performed inside a single operation
+        var modifier = {$push: {'plants': newPlant}, $set: {'status': 'unsaved'}};
         updateLocalHouse(Session.get('selectedHouseId'), modifier);
     },
 
-    'click button#saveHouse': function (evt) {
+    'click button#save-house': function (evt) {
         // suppress page's default submit behaviour
         evt.preventDefault();
 
         var id = Session.get('selectedHouseId');
-        var modifier = {$set: {'lastsave': new Date()}};
+        var modifier = {
+            $set: {
+                'lastsave': new Date(),
+                'status': 'saved'
+            }
+        };
         updateLocalHouse(id, modifier);
         // persist house document in remote db
         HousesCollection.upsert(
@@ -135,6 +144,31 @@ Template.houseForm.events({
         );
     }
 });
+
+Template.houseForm.created = function () {
+    this.autorun(function () {
+
+        // if the doc already exists on the server, and it's newer than the local version
+        if (HousesCollection.findOne(Session.get('selectedHouseId')) &&
+            LocalHouse.findOne(Session.get('selectedHouseId')).lastsave <
+            HousesCollection.findOne(Session.get('selectedHouseId')).lastsave) {
+            Session.set("notification", {
+                type: 'warning',
+                text: 'This document has been changed inside the database!'
+            });
+        }
+        // check if local doc has unsaved status
+        else if (LocalHouse.findOne(Session.get('selectedHouseId')) &&
+            LocalHouse.findOne(Session.get('selectedHouseId')).status === 'unsaved') {
+            Session.set("notification", {
+                type: 'reminder',
+                text: 'Remember to save your changes'
+            });
+        } else {
+            Session.set('notification', '');
+        }
+    })
+};
 
 
 // called for both color and instructions fields changes
@@ -150,6 +184,7 @@ Template.plantFieldset.events({
 
         // Assign the new value using bracket notation
         modifier['$set'][plantProperty] = evt.target.value;
+        modifier['$set'].status = 'unsaved';
         // perform the update
         updateLocalHouse(Session.get('selectedHouseId'), modifier);
     },
@@ -163,9 +198,15 @@ Template.plantFieldset.events({
 
         // js splice can be used to remove elements, in this case remove 1 element at index 'index'
         plants.splice(index, 1);
-        var modifier = {$set: {'plants': plants}};
+        var modifier = {$set: {'plants': plants, 'status': 'unsaved'}};
         updateLocalHouse(Session.get('selectedHouseId'), modifier);
     },
+});
+
+Template.notificationArea.helpers({
+    notification: function () {
+        return Session.get("notification");
+    }
 });
 
 updateLocalHouse = function (id, modifier) {
