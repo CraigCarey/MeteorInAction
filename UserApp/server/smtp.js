@@ -30,7 +30,6 @@ Accounts.emailTemplates.verifyEmail.text = function (user, url) {
 
 Accounts.emailTemplates.verifyEmail.html = function (user, url) {
     return "<h1>Welcome to the Meteor in Action userApp!</h1>"
-        + "<p>To <strong>verify your email address<strong> go ahead and follow the link
-    below:</p>"
+        + "<p>To <strong>verify your email address<strong> go ahead and follow the link below:</p>"
     + url;
 };
