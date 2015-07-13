@@ -106,22 +106,73 @@ Template.plantDetails.events({
 });
 
 Template.houseForm.events({
+
+    // updates house-name on each change
+    'keyup input#house-name': function (evt) {
+        evt.preventDefault();
+        var modifier = {$set: {'name': evt.currentTarget.value}};
+        updateLocalHouse(Session.get('selectedHouseId'), modifier);
+    },
+
+    'click button.addPlant': function (evt) {
+        evt.preventDefault();
+        var newPlant = {color: '', instructions: ''};
+        var modifier = {$push: {'plants': newPlant}};
+        updateLocalHouse(Session.get('selectedHouseId'), modifier);
+    },
+
     'click button#saveHouse': function (evt) {
         // suppress page's default submit behaviour
         evt.preventDefault();
 
-        // Use jQuery to retrieve input field values and put them in local variables
-        var houseName = $('input[id=house-name]').val();
-        var plantColor = $('input[id=plant-color]').val();
-        var plantInstructions = $('input[id=plant-instructions]').val();
-        Session.set('selectedHouseId', HousesCollection.insert({
-            name: houseName,
-            plants: [{
-                color: plantColor,
-                instructions: plantInstructions
-            }]
-        }));
-        // clear the form
-        $('input').val('');
+        var id = Session.get('selectedHouseId');
+        var modifier = {$set: {'lastsave': new Date()}};
+        updateLocalHouse(id, modifier);
+        // persist house document in remote db
+        HousesCollection.upsert(
+            {_id: id},
+            LocalHouse.findOne(id)
+        );
     }
 });
+
+
+// called for both color and instructions fields changes
+Template.plantFieldset.events({
+    'keyup input.color, keyup input.instructions': function (evt) {
+        evt.preventDefault();
+        var index = evt.target.getAttribute('data-index');
+        var field = evt.target.getAttribute('class');
+
+        // concat the exact identifier for the plant and property, i.e. plants.1.color
+        var plantProperty = 'plants.' + index + '.' + field;
+        var modifier = {$set: {}};
+
+        // Assign the new value using bracket notation
+        modifier['$set'][plantProperty] = evt.target.value;
+        // perform the update
+        updateLocalHouse(Session.get('selectedHouseId'), modifier);
+    },
+
+    'click button.removePlant': function (evt) {
+        evt.preventDefault();
+        var index = evt.target.getAttribute('data-index');
+
+        // get array of plants from parent template (1 level up is default)
+        var plants = Template.parentData(1).plants;
+
+        // js splice can be used to remove elements, in this case remove 1 element at index 'index'
+        plants.splice(index, 1);
+        var modifier = {$set: {'plants': plants}};
+        updateLocalHouse(Session.get('selectedHouseId'), modifier);
+    },
+});
+
+updateLocalHouse = function (id, modifier) {
+    LocalHouse.update(
+        {
+            '_id': id
+        },
+        modifier
+    );
+};
