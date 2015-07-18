@@ -1,3 +1,6 @@
+// gets data from custom aggregation publication
+DistanceByMonth = new Mongo.Collection('distanceByMonth');
+
 // For the limit parameter of the subscription, a Session variable with a default value of 10 is initialised first
 Session.setDefault('limit', 10);
 
@@ -21,5 +24,20 @@ Template.workoutList.events({
     }
 });
 
-// gets data from custom aggregation publication
-DistanceByMonth = new Mongo.Collection('distanceByMonth');
+Template.addWorkout.events({
+    'submit form': function (evt, tpl) {
+        evt.preventDefault();
+
+        // Use jQuery to extract the data from the distance input field and make it an integer
+        var distance = parseInt(tpl.$('input[name="distance"]').val());
+
+        // call a shared method by name, and optional parameters
+        Meteor.call('CreateWorkout', {
+            distance: distance
+        },
+        // passed in a callback for return values or errors
+        function (error, result) {
+            if (error) return alert('Error: ' + error.error);
+        });
+    }
+});
